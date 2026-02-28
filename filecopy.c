@@ -22,19 +22,30 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	// File descriptor for pipe
+	// fd[0] for reading, fd[1] for writing
+	int fd[2]; 
+
+	if (pipe(fd) == -1 ) { 
+		printf("Pipe error. ");
+		return 1; 
+	}
+
+	int id = fork(); 
+
+	// Opening file for reading 
 	FILE* fptr; // pointer 
-
-
 	fptr = fopen(argv[1], "r"); 
-
 	if (fptr == NULL) { 
 		printf("File not found."); 
 		return 1; 
 	}
 
 
+	if (id != 0) { 
+		printf("Parent Process started."); 
+	} 
 
-	
 
 
 	return 0; 
