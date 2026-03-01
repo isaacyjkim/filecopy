@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-
 	// File descriptor for pipe
 	// fd[0] for reading, fd[1] for writing
 	int fd[2]; 
@@ -36,19 +35,8 @@ int main(int argc, char *argv[])
 	// Creating pipe and assigning int value to id
 	int id = fork(); 
 
-	// Opening file for reading 
-	FILE *fptr; // pointer 
-	fptr = fopen(argv[1], "r"); 
-
-	// Check if file is found
-	if (fptr == NULL) { 
-		printf("File not found."); 
-		return 1; 
-	}
-
-
-
-	char str[] = "test string";
+	char buffer[4096];
+	size_t bytes_read; 
 
 	// if id == 0, run child process
 	if (id == 0) { 
@@ -56,18 +44,47 @@ int main(int argc, char *argv[])
 		// Read from the read end of the pipe and write to destination file
 		printf("Child Process started.\n"); 
 		close(fd[1]); // close write end of file descriptor
-		char buffer[100]; 
-		read(fd[0], buffer, sizeof(buffer)); 
-		printf("Got from parent pipe: %s\n",buffer); 
-		close(fd[0]);
+	
+		FILE *output_file; 
+		output_file = fopen(argv[2],"w"); 
+		if (out_file == NULL) { 
+			printf("Error creating destination file.");
+			return 1; 
+		} 
+		
+		while ( bytes_read = read(fd[0],buffer,sizeof(buffer)) > 0 ) {
 
+			read(fd[0], buffer, sizeof(buffer)); 
+			fprintf(output_file,"%s",buffer); 
+		
+		fclose(output_file); 
+		close(fd[0]);
 	}
 	else { 
 		// Parent Process
 		// Read from source file and write to write end of the pipe
 		printf("Parent Process started.\n");
 		close(fd[0]); // close read end of file descriptor
-		write(fd[1], str , strlen(str) + 1);
+		
+		// Opening file for reading 
+		FILE *fptr; // pointer 
+		fptr = fopen(argv[1], "r"); 
+
+		// Check if file is found
+		if (fptr == NULL) { 
+			printf("File not found."); 
+			return 1; 
+		}
+
+		// Continue to read from source files until no bytes are read, and 
+		// write onto write end of file descriptor. 
+		while (bytes_read = fread(buffer,1,sizeof(buffer),fptr) > 0 ) { 
+			write(fd[1], buffer , sizeof(buffer));
+		}
+
+
+		// Close source file and write end of file descriptor 
+		fclose(fptr); 
 		close(fd[1]); 
 		
 	}
