@@ -3,7 +3,7 @@ A C program that copies the contents of one file to another using two processes 
 
 
 ## Compilation
-This project was done on macOS Tahoe 26.2. Shell: zsh 
+This project was done on macOS Tahoe 26.2. Shell: zsh \
 You will need 'gcc' installed. To compile make sure you are in the same directory where filecopy.c is located and run: 
 
 ```
